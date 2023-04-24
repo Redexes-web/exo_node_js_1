@@ -1,7 +1,7 @@
 const express = require('express');
-const router = require('./app/routes/index');
+const router = require('./App/routes/index');
 const app = express();
-const db = require('./app/models/index.js');
+const db = require('./App/models/index.js');
 db.sequelize
 	.authenticate()
 	.then(() => console.log('Database connected ...'))
