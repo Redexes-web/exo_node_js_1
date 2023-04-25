@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
 			return res.status(401).json({ error: 'User sNot Found' });
 		}
 
-		const token = jwt.sign({ userId: user.id }, 'secret_key', {
+		const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECRET, {
 			expiresIn: '24h',
 		});
 
