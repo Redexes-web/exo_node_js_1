@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express();
-const auth = require("../middleware/auth.js")
-
+const auth = require('../middleware/auth.js');
+const multer = require('../middleware/multer');
 const woodCtrl = require('../controllers/wood.js');
-router.get('/',auth, woodCtrl.getAllWoods);
-router.get('/hardness/:hardness',auth, woodCtrl.findByHardness);
+router.get('/', auth, woodCtrl.getAllWoods);
+router.post('/', auth, multer, woodCtrl.createWoods);
+router.get('/:id', auth, woodCtrl.getOneWoods);
+router.get('/hardness/:hardness', auth, woodCtrl.findByHardness);
 module.exports = router;
