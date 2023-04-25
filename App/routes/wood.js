@@ -7,4 +7,5 @@ router.get('/', auth, woodCtrl.getAllWoods);
 router.post('/', auth, multer, woodCtrl.createWoods);
 router.get('/:id', auth, woodCtrl.getOneWoods);
 router.get('/hardness/:hardness', auth, woodCtrl.findByHardness);
+router.delete('/:id',auth, woodCtrl.deleteOneWoods);
 module.exports = router;
