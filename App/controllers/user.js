@@ -4,7 +4,6 @@ const { User } = require('../models');
 
 exports.signup = async (req, res) => {
 	try {
-		const { password, ...userData } = req.body;
 
 		// Create user in database
 		const user = await User.create({
