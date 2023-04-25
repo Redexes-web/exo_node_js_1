@@ -1,9 +1,10 @@
 const { Wood } = require('../models');
 
 exports.createWoods = (req, res, next) => {
+    //path = si null alors on met null sinon on met le chemin de l'image
 	const wood = new Wood({
 		...req.body,
-		image: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`,
+		image: req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null,
 	});
 
 	// On enregistre l'objet Wood dans la base de données
