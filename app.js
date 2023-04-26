@@ -3,10 +3,14 @@ const router = require('./App/routes/index');
 const app = express();
 const db = require('./App/models/index.js');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
 db.sequelize
 	.authenticate()
 	.then(() => console.log('Database connected ...'))
 	.catch((err) => console.log(err));
+//Ajout de swagger
+const swaggerDocument = require('./swagger.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 //Ajout des routes

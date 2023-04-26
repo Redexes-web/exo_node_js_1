@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
 	class Wood extends Model {
 		static associate(models) {
 			Wood.belongsTo(models.WoodType, {
-				foreignKey: 'woodTypeId',
+				foreignKey: 'typeId',
 			});
 			Wood.belongsTo(models.Hardness, {
 				foreignKey: 'hardnessId',

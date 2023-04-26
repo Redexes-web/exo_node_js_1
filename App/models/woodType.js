@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
 	class WoodType extends Model {
 		static associate(models) {
 			WoodType.hasMany(models.Wood, {
-				foreignKey: 'woodTypeId',
+				foreignKey: 'typeId',
 			});
 		}
 	}
@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			modelName: 'WoodType',
+            timestamps: false
+
 		}
 	);
 	return WoodType;

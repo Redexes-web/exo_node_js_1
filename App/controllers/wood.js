@@ -1,4 +1,4 @@
-const { Wood } = require('../models');
+const { Wood, Hardness, WoodType } = require('../models');
 const fs = require('fs');
 const path = require('path');
 
@@ -22,7 +22,12 @@ exports.createWoods = (req, res, next) => {
 
 exports.getOneWoods = async (req, res, next) => {
 	try {
-		const woods = await Wood.findByPk(req.params.id);
+		const woods = await Wood.findByPk(req.params.id, {
+			include: [
+				{ model: Hardness },
+				{ model: WoodType },
+			],
+		});
         if (!woods) {
             return res.status(404).json({ error: 'Essence de bois non trouvée !' });
         }
@@ -41,14 +46,63 @@ exports.getAllWoods = async (req, res) => {
 		res.status(500).send('Error retrieving woods');
 	}
 };
+exports.updateWoods = async (req, res, next) => {
+	try {
+		let wood = await Wood.findByPk(req.params.id);
+
+		if (!wood) {
+			return res.status(404).json({ error: 'Wood not found' });
+		}
+
+		if (req.file && wood.image) {
+			const imagePath = wood.image.split(`${req.protocol}://${req.get('host')}/uploads/`)[1];
+			fs.access(`uploads/${imagePath}`, fs.F_OK, (err) => {
+				if (err) {
+					console.error(err);
+					return;
+				}
+				fs.unlink(`uploads/${imagePath}`, (err) => {
+					if (err) {
+						console.error(err);
+						return;
+					}
+				});
+			});
+		}
+
+		wood.name = req.body.name;
+		wood.description = req.body.description;
+		wood.hardnessId = parseInt(req.body.hardnessId);
+		wood.woodTypeId = parseInt(req.body.woodTypeId);
+		wood.image = req.file
+			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+			: null;
+
+		await wood.save();
+
+		res.status(200).json({ message: 'Wood updated successfully' });
+	} catch (error) {
+		console.error(error);
+		res.status(500).send('Error updating wood');
+	}
+};
 exports.findByHardness = async (req, res) => {
 	const { hardness } = req.params;
 
 	try {
+		const hardnessData = await Hardness.findOne({
+			where: {
+				name: hardness,
+			},
+		});
 		const woods = await Wood.findAll({
 			where: {
-				hardness: hardness,
+				hardnessId: hardnessData.id,
 			},
+			include: [
+				{ model: Hardness },
+				{ model: WoodType },
+			]
 		});
 
 		res.json(woods);

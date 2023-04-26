@@ -1,0 +1,554 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "API Wood",
+        "description": "API for managing wood data",
+        "version": "1.0.0"
+    },
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/auth/signup": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a new user",
+                "description": "Creates a new user and returns the user object",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "User",
+                        "in": "body",
+                        "description": "The user object to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Log in to the application",
+                "description": "Logs in a user and returns the user object and a token",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Credentials",
+                        "in": "body",
+                        "description": "The user's email and password",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User logged in",
+                        "schema": {
+                            "$ref": "#/definitions/LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid email or password"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/woods": {
+            "get": {
+                "tags": [
+                    "Wood"
+                ],
+                "summary": "Retrieve all woods",
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of woods",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Wood"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Wood"
+                ],
+                "summary": "Create a new wood",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "woodTypeId",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "hardnessId",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Wood created"
+                    },
+                    "400": {
+                        "description": "Invalid input data"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/woods/hardness/{hardness}": {
+            "get": {
+                "tags": [
+                    "Wood"
+                ],
+                "summary": "Get a wood by hardness name",
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "hardness",
+                        "type": "string",
+                        "required": true,
+                        "description": "Name of the wood's hardness"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Woods returned",
+                        "schema": {
+                            "$ref": "#/definitions/Wood"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Woods not found"
+                    }
+                }
+            }
+        },
+        "/woods/{id}": {
+            "get": {
+                "tags": [
+                    "Wood"
+                ],
+                "summary": "Get a wood by id",
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "required": true,
+                        "description": "ID of the wood to get"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wood returned",
+                        "schema": {
+                            "$ref": "#/definitions/Wood"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Wood not found"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "tags": [
+                    "Wood"
+                ],
+                "summary": "Update wood by id",
+                "description": "Updates wood data and image if provided",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of wood to update",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "name",
+                        "in": "formData",
+                        "description": "Updated name of wood",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "hardnessId",
+                        "in": "formData",
+                        "description": "Updated hardness ID of wood",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "woodTypeId",
+                        "in": "formData",
+                        "description": "Updated wood type ID of wood",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "image",
+                        "in": "formData",
+                        "description": "Updated image of wood",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Invalid request data"
+                    },
+                    "404": {
+                        "description": "Wood not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Wood"
+                ],
+                "summary": "Delete a wood by id",
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "required": true,
+                        "description": "ID of the wood to delete"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Wood deleted"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Wood not found"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "WoodType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Hardness": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Wood": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "hardnessId": {
+                    "type": "integer"
+                },
+                "typeId": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "Hardness": {
+                    "$ref": "#/definitions/Hardness"
+                },
+                "WoodType": {
+                    "$ref": "#/definitions/WoodType"
+                },
+                "createdAt": {
+                    "type": "datetime"
+                },
+                "updatedAt": {
+                    "type": "datetime"
+                }
+            }
+        },
+        "Credentials": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "LoginResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/User"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Wood": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identifiant unique de la ressource."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nom du bois."
+                    },
+                    "image": {
+                        "type": "string",
+                        "description": "Lien vers l'image du bois."
+                    },
+                    "typeId": {
+                        "type": "integer",
+                        "description": "Identifiant de la catégorie de bois."
+                    },
+                    "hardnessId": {
+                        "type": "integer",
+                        "description": "Identifiant de la dureté du bois."
+                    }
+                },
+                "required": [
+                    "name",
+                    "image",
+                    "typeId",
+                    "hardnessId"
+                ]
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identifiant unique de la ressource."
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "description": "Prénom de l'utilisateur."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": "Nom de famille de l'utilisateur."
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Adresse e-mail de l'utilisateur."
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Mot de passe de l'utilisateur."
+                    }
+                },
+                "required": [
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "password"
+                ]
+            },
+            "WoodType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identifiant unique de la ressource."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nom de la catégorie de bois."
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "Hardness": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Identifiant unique de la ressource."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nom de la dureté du bois."
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            }
+        }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT token obtained from the /login endpoint"
+        }
+    }
+}
