@@ -10,13 +10,6 @@ module.exports = {
 		]);
 		const hardnessMap = new Map(hardnessData[0].map((h) => [h.name, h.id]));
 		const woodTypesMap = new Map(woodTypesData[0].map((t) => [t.name, t.id]));
-		console.log(hardnessMap.get('tender'));
-		console.log(woodTypesMap.get('softwood'));
-		console.log(hardnessMap.get('medium-hard'));
-		console.log(woodTypesMap.get('exotic wood'));
-		console.log(hardnessMap.get('hard'));
-		console.log(woodTypesMap.get('noble and hardwood'));
-
 		await queryInterface.bulkInsert('Woods', [
 			{
 				name: 'Épicéa',
