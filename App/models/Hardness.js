@@ -1,25 +1,21 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-	class Wood extends Model {
+	class Hardness extends Model {
 		static associate(models) {
-			Wood.belongsTo(models.WoodType, {
-				foreignKey: 'woodTypeId',
-			});
-			Wood.belongsTo(models.Hardness, {
+			Hardness.hasMany(models.Wood, {
 				foreignKey: 'hardnessId',
 			});
 		}
 	}
-	Wood.init(
+	Hardness.init(
 		{
 			name: DataTypes.STRING,
-			image: DataTypes.STRING,
 		},
 		{
 			sequelize,
-			modelName: 'Wood',
+			modelName: 'Hardness',
 		}
 	);
-	return Wood;
+	return Hardness;
 };
