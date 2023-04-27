@@ -158,9 +158,9 @@ exports.deleteOneWoods = async (req, res, next) => {
 					});
 				}
 			});
-			wood.destroy();
-			res.status(204).json();
 		}
+		wood.destroy();
+		res.status(204).json();
 	} catch (error) {
 		console.error(error);
 		res.status(500).send('Error deleting wood');
