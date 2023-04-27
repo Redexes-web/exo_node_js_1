@@ -11,17 +11,17 @@ exports.createWoods = async (req, res, next) => {
 			: null,
 	});
 	console.log(req.body);
-			// Check if the typeId and hardnessId exist in the database before saving
-			const [hardness, type] = await Promise.all([
-				Hardness.findByPk(wood.hardnessId),
-				WoodType.findByPk(wood.typeId),
-			]);
-			if (!hardness) {
-				return res.status(404).json({ error: 'Hardness not found' });
-			}
-			if (!type) {
-				return res.status(404).json({ error: 'Wood type not found' });
-			}
+	// Check if the typeId and hardnessId exist in the database before saving
+	const [hardness, type] = await Promise.all([
+		Hardness.findByPk(wood.hardnessId),
+		WoodType.findByPk(wood.typeId),
+	]);
+	if (!hardness) {
+		return res.status(404).json({ error: 'Hardness not found' });
+	}
+	if (!type) {
+		return res.status(404).json({ error: 'Wood type not found' });
+	}
 
 	// On enregistre l'objet Wood dans la base de données
 	wood
@@ -49,8 +49,8 @@ exports.getOneWoods = async (req, res, next) => {
 exports.getAllWoods = async (req, res) => {
 	try {
 		const woods = await Wood.findAll({
-			include: [{ model: Hardness }, { model: WoodType }]
-		  });
+			include: [{ model: Hardness }, { model: WoodType }],
+		});
 		res.json(woods);
 	} catch (error) {
 		console.error(error);
@@ -146,19 +146,18 @@ exports.deleteOneWoods = async (req, res, next) => {
 			const imagePath = wood.image.split(
 				`${req.protocol}://${req.get('host')}/uploads/`
 			)[1];
-
-			// On supprime le fichier correspondant
-			fs.unlink(`uploads/${imagePath}`, (err) => {
+			fs.access(`uploads/${imagePath}`, fs.F_OK, (err) => {
 				if (err) {
-					console.error(err);
-					return res.status(500).json({ error: 'Error deleting image' });
+					console.error('err' + err);
+				} else {
+					fs.unlink(`uploads/${imagePath}`, (err) => {
+						if (err) {
+							console.error(err);
+							return res.status(500).send('Error deleting wood image');
+						}
+					});
 				}
-				// Si la suppression s'est bien passée, on supprime l'essence de bois de la base de données
-				wood.destroy();
-				res.status(204).json();
 			});
-		} else {
-			// Si l'essence de bois n'a pas d'image associée, on supprime directement l'essence de bois de la base de données
 			wood.destroy();
 			res.status(204).json();
 		}
