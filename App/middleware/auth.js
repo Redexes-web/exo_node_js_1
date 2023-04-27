@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
 		next();
 	} catch (err) {
 		res.status(401).json({
-			error: 'Invalid Request!'
+			error: 'Vous devez être connecté pour accéder à cette ressource',
 		});
 	}
 };

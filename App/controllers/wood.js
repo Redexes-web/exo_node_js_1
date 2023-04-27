@@ -2,143 +2,113 @@ const { Wood, Hardness, WoodType } = require('../models');
 const fs = require('fs');
 const path = require('path');
 
+// Create a wood
 exports.createWoods = async (req, res, next) => {
-	//path = si null alors on met null sinon on met le chemin de l'image
-	const wood = new Wood({
-		...req.body,
-		image: req.file
-			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-			: null,
-	});
-	console.log(req.body);
-	// Check if the typeId and hardnessId exist in the database before saving
-	const [hardness, type] = await Promise.all([
-		Hardness.findByPk(wood.hardnessId),
-		WoodType.findByPk(wood.typeId),
-	]);
-	if (!hardness) {
-		return res.status(404).json({ error: 'Hardness not found' });
-	}
-	if (!type) {
-		return res.status(404).json({ error: 'Wood type not found' });
-	}
+  try {
+    const imagePath = req.file
+      ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+      : null;
 
-	// On enregistre l'objet Wood dans la base de données
-	wood
-		.save()
-		.then(() =>
-			res.status(201).json({ message: 'Essence de bois enregistrée !' })
-		)
-		.catch((error) => res.status(400).json({ error }));
+    const wood = await Wood.create({
+      ...req.body,
+      image: imagePath,
+    });
+
+    res.status(201).json({ wood });
+  } catch (error) {
+    next(error);
+  }
 };
 
+// Get one wood by id
 exports.getOneWoods = async (req, res, next) => {
-	try {
-		const woods = await Wood.findByPk(req.params.id, {
-			include: [{ model: Hardness }, { model: WoodType }],
-		});
-		if (!woods) {
-			return res.status(404).json({ error: 'Essence de bois non trouvée !' });
-		}
-		res.json(woods);
-	} catch (error) {
-		console.error(error);
-		res.status(500).send('Error retrieving woods');
-	}
+  try {
+    const wood = await Wood.findByPk(req.params.id, {
+      include: [{ model: Hardness }, { model: WoodType }],
+    });
+
+    if (!wood) {
+      return res.status(404).json({ error: 'Bois non trouvé !' });
+    }
+
+    res.json({ wood });
+  } catch (error) {
+    next(error);
+  }
 };
-exports.getAllWoods = async (req, res) => {
-	try {
-		const woods = await Wood.findAll({
-			include: [{ model: Hardness }, { model: WoodType }],
-		});
-		res.json(woods);
-	} catch (error) {
-		console.error(error);
-		res.status(500).send('Error retrieving woods');
-	}
+
+// Get all woods
+exports.getAllWoods = async (req, res, next) => {
+  try {
+    const woods = await Wood.findAll({
+      include: [{ model: Hardness }, { model: WoodType }],
+    });
+
+    res.json({ woods });
+  } catch (error) {
+    next(error);
+  }
 };
+
+// Update a wood by id
 exports.updateWoods = async (req, res, next) => {
 	try {
-		let wood = await Wood.findByPk(parseInt(req.params.id));
-
-		if (!wood) {
-			return res.status(404).json({ error: 'Wood not found' });
+	  const wood = await Wood.findByPk(parseInt(req.params.id));
+  
+	  if (!wood) {
+		return res.status(404).json({ error: 'Bois non trouvé !' });
+	  }
+  
+	  const imagePath = req.file
+		? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+		: null;
+  
+	  if (req.file && wood.image) {
+		const imagePath = wood.image.split(
+		  `${req.protocol}://${req.get('host')}/uploads/`
+		)[1];
+		if (fs.existsSync(`uploads/${imagePath}`)) {
+		  await fs.promises.unlink(`uploads/${imagePath}`);
 		}
-
-		if (req.file && wood.image) {
-			const imagePath = wood.image.split(
-				`${req.protocol}://${req.get('host')}/uploads/`
-			)[1];
-			fs.access(`uploads/${imagePath}`, fs.F_OK, (err) => {
-				if (err) {
-					console.error(err);
-					return;
-				}
-				fs.unlink(`uploads/${imagePath}`, (err) => {
-					if (err) {
-						console.error(err);
-						return;
-					}
-				});
-			});
-		}
-		wood.name = req.body.name;
-		wood.description = req.body.description;
-		wood.hardnessId = parseInt(req.body.hardnessId);
-		wood.typeId = parseInt(req.body.typeId);
-
-		// Check if the typeId and hardnessId exist in the database before saving
-		const [hardness, type] = await Promise.all([
-			Hardness.findByPk(wood.hardnessId),
-			WoodType.findByPk(wood.typeId),
-		]);
-		if (!hardness) {
-			return res.status(404).json({ error: 'Hardness not found' });
-		}
-		if (!type) {
-			return res.status(404).json({ error: 'Wood type not found' });
-		}
-
-		wood.image = req.file
-			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-			: wood.image;
-
-		await wood.save();
-
-		res.status(200).json({ message: 'Wood updated successfully' });
+	  }
+  
+	  await wood.update({ ...req.body, image: imagePath });
+  
+	  res.json({ wood });
 	} catch (error) {
-		console.error(error);
-		res.status(500).send('Error updating wood');
+	  next(error);
 	}
-};
-exports.findByHardness = async (req, res) => {
-	const { hardness } = req.params;
+  };
 
-	try {
-		const hardnessData = await Hardness.findOne({
-			where: {
-				name: hardness,
-			},
-		});
-		const woods = await Wood.findAll({
-			where: {
-				hardnessId: hardnessData.id,
-			},
-			include: [{ model: Hardness }, { model: WoodType }],
-		});
+// Get woods by hardness
+exports.findByHardness = async (req, res, next) => {
+  try {
+    const { hardness } = req.params;
 
-		res.json(woods);
-	} catch (error) {
-		console.error(error);
-		res.status(500).send('Error retrieving woods by hardness');
-	}
+    const hardnessData = await Hardness.findOne({
+      where: {
+        name: hardness,
+      },
+    });
+
+    const woods = await Wood.findAll({
+      where: {
+        hardnessId: hardnessData.id,
+      },
+      include: [{ model: Hardness }, { model: WoodType }],
+    });
+
+    res.json({ woods });
+  } catch (error) {
+    next(error);
+  }
 };
 exports.deleteOneWoods = async (req, res, next) => {
 	try {
 		const wood = await Wood.findByPk(req.params.id);
 
 		if (!wood) {
-			return res.status(404).json({ error: 'Wood not found' });
+			return res.status(404).json({ error: 'Bois non trouvé !' });
 		}
 
 		if (wood.image) {
@@ -153,7 +123,9 @@ exports.deleteOneWoods = async (req, res, next) => {
 					fs.unlink(`uploads/${imagePath}`, (err) => {
 						if (err) {
 							console.error(err);
-							return res.status(500).send('Error deleting wood image');
+							return res
+								.status(500)
+								.send('Erreur lors de la suppression du bois');
 						}
 					});
 				}
@@ -163,6 +135,6 @@ exports.deleteOneWoods = async (req, res, next) => {
 		res.status(204).json();
 	} catch (error) {
 		console.error(error);
-		res.status(500).send('Error deleting wood');
+		res.status(500).send('Erreur lors de la suppression du bois');
 	}
 };

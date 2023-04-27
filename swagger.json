@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "API Wood",
-        "description": "API for managing wood data",
+        "description": "API de gestion de bois",
         "version": "1.0.0"
     },
     "basePath": "/api",
@@ -92,7 +92,7 @@
                 "tags": [
                     "Wood"
                 ],
-                "summary": "Retrieve all woods",
+                "summary": "Réccupère la liste des bois",
                 "produces": [
                     "application/json"
                 ],
@@ -103,7 +103,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of woods",
+                        "description": "Liste des bois",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -112,7 +112,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Vous devez être connecté pour accéder à cette ressource"
                     }
                 }
             },
@@ -120,7 +120,7 @@
                 "tags": [
                     "Wood"
                 ],
-                "summary": "Create a new wood",
+                "summary": "Créer un nouveau bois",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -160,13 +160,16 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Wood created"
+                        "description": "Bois créé",
+                        "schema": {
+                            "$ref": "#/definitions/Wood"
+                        }
                     },
-                    "400": {
-                        "description": "Invalid input data"
+                    "500": {
+                        "description": "Une erreur est survenue lors de la création du bois"
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Vous devez être connecté pour accéder à cette ressource"
                     }
                 }
             }
@@ -176,7 +179,7 @@
                 "tags": [
                     "Wood"
                 ],
-                "summary": "Get a wood by hardness name",
+                "summary": "Obtenir les bois par dureté",
                 "produces": [
                     "application/json"
                 ],
@@ -191,22 +194,22 @@
                         "name": "hardness",
                         "type": "string",
                         "required": true,
-                        "description": "Name of the wood's hardness"
+                        "description": "Nom de la dureté"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Woods returned",
+                        "description": "Liste des bois par dureté",
                         "schema": {
                             "type": "array",
                             "$ref": "#/definitions/Wood"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Vous devez être connecté pour accéder à cette ressource"
                     },
-                    "404": {
-                        "description": "Woods not found"
+                    "500": {
+                        "description": "Erreur lors de la récupération des bois par dureté"
                     }
                 }
             }
@@ -216,7 +219,7 @@
                 "tags": [
                     "Wood"
                 ],
-                "summary": "Get a wood by id",
+                "summary": "Obtenir un bois par son ID",
                 "produces": [
                     "application/json"
                 ],
@@ -231,21 +234,24 @@
                         "name": "id",
                         "type": "integer",
                         "required": true,
-                        "description": "ID of the wood to get"
+                        "description": "ID du bois à récupérer"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Wood returned",
+                        "description": "Bois récupéré",
                         "schema": {
                             "$ref": "#/definitions/Wood"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Vous devez être connecté pour accéder à cette ressource"
                     },
                     "404": {
-                        "description": "Wood not found"
+                        "description": "Bois non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur lors de la récupération du bois"
                     }
                 }
             },
@@ -258,13 +264,13 @@
                 "tags": [
                     "Wood"
                 ],
-                "summary": "Update wood by id",
-                "description": "Updates wood data and image if provided",
+                "summary": "Mettre à jour un bois",
+                "description": "Met à jour un bois et son image si elle est fournie",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID of wood to update",
+                        "description": "ID du bois à mettre à jour",
                         "required": true,
                         "type": "integer",
                         "format": "int64"
@@ -272,14 +278,14 @@
                     {
                         "name": "name",
                         "in": "formData",
-                        "description": "Updated name of wood",
+                        "description": "Nom du bois mis à jour",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "hardnessId",
                         "in": "formData",
-                        "description": "Updated hardness ID of wood",
+                        "description": "ID de la dureté du bois mis à jour",
                         "required": true,
                         "type": "integer",
                         "format": "int64"
@@ -287,7 +293,7 @@
                     {
                         "name": "typeId",
                         "in": "formData",
-                        "description": "Updated wood type ID of wood",
+                        "description": "ID du type du bois mis à jour",
                         "required": true,
                         "type": "integer",
                         "format": "int64"
@@ -295,23 +301,23 @@
                     {
                         "name": "image",
                         "in": "formData",
-                        "description": "Updated image of wood",
+                        "description": "Image du bois mis à jour",
                         "required": false,
                         "type": "file"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
-                    },
-                    "400": {
-                        "description": "Invalid request data"
+                        "description": "Bois mis à jour",
+                        "schema": {
+                            "$ref": "#/definitions/Wood"
+                        }
                     },
                     "404": {
-                        "description": "Wood not found"
+                        "description": "Bois non trouvé"
                     },
                     "500": {
-                        "description": "Internal server error"
+                        "description": "Une erreur est survenue lors de la mise à jour du bois"
                     }
                 }
             },
@@ -319,7 +325,7 @@
                 "tags": [
                     "Wood"
                 ],
-                "summary": "Delete a wood by id",
+                "summary": "Supprimer un bois",
                 "produces": [
                     "application/json"
                 ],
@@ -334,18 +340,21 @@
                         "name": "id",
                         "type": "integer",
                         "required": true,
-                        "description": "ID of the wood to delete"
+                        "description": "ID du bois à supprimer"
                     }
                 ],
                 "responses": {
                     "204": {
-                        "description": "Wood deleted"
+                        "description": "Bois supprimé"
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Vous devez être connecté pour accéder à cette ressource"
                     },
                     "404": {
-                        "description": "Wood not found"
+                        "description": "Bois non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur lors de la suppression du bois"
                     }
                 }
             }

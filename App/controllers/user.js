@@ -1,17 +1,22 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
-const sequelize = require('sequelize');
+const { encryptEmail, decryptEmail } = require('../utils/crypto');
+
 exports.signup = async (req, res) => {
 	try {
 		const user = await User.create({
 			...req.body,
-			email: sequelize.literal(
-				`HEX(AES_ENCRYPT('${req.body.email}', '${process.env.ENCRYPTION_SECRET}'))`
-			),
+			email: encryptEmail(req.body.email),
 			password: await bcrypt.hash(req.body.password, 10),
 		});
-		res.status(201).json({ ...user.dataValues, email: req.body.email, password: undefined,createdAt: undefined, updatedAt: undefined });
+		res.status(201).json({
+			...user.dataValues,
+			email: req.body.email,
+			password: undefined,
+			createdAt: undefined,
+			updatedAt: undefined,
+		});
 	} catch (error) {
 		console.error(error);
 		res.status(500).send('Error create user');
@@ -40,18 +45,18 @@ exports.login = async (req, res) => {
 		const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECRET, {
 			expiresIn: '24h',
 		});
-        console.log(user.id)
+
 		res.json({
 			user: {
 				id: user.id,
 				firstName: user.firstName,
 				lastName: user.lastName,
-				email: user.email.toString('utf8'),
+				email: decryptEmail(user.email),
 			},
 			token,
 		});
 	} catch (error) {
 		console.error(error);
-		res.status(500).send('Error Authenticatings User');
+		res.status(500).send('Error Authenticating User');
 	}
 };

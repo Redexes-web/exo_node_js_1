@@ -1,6 +1,8 @@
 'use strict';
 const { Model } = require('sequelize');
 const { isEmail } = require('validator');
+const CryptoJS = require('crypto-js');
+const { encryptEmail, decryptEmail } = require('../utils/crypto.js');
 
 module.exports = (sequelize, DataTypes) => {
 	class User extends Model {
@@ -9,19 +11,13 @@ module.exports = (sequelize, DataTypes) => {
 		}
 		static findOneByEmail = async (email) => {
       
-      const user = await User.findOne({
-        where: sequelize.literal(
-          `AES_DECRYPT(UNHEX(email), '${process.env.ENCRYPTION_SECRET}') = '${email}'`
-        ),
-        attributes: [
-          'id',
-          'firstName',
-          'lastName',
-          [sequelize.fn('AES_DECRYPT', sequelize.fn('UNHEX', sequelize.col('email')), process.env.ENCRYPTION_SECRET), 'email'],
-          `password`,
-          `createdAt`,
-          `updatedAt`,
-        ],
+      //findall puis boucle sur le tableau pour trouver l'email correspondant
+      
+      const users = await User.findAll();
+      const user = users.find((user) => {
+        const decryptedEmail = decryptEmail(user.email);
+        console.log(decryptedEmail, email);
+        return decryptedEmail === email;
       });
 			return user;
 		};
