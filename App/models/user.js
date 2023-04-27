@@ -7,15 +7,21 @@ module.exports = (sequelize, DataTypes) => {
 		static associate(models) {
 			// define association here
 		}
-		static findByEmail = async (email, secretKey) => {
+		static findOneByEmail = async (email) => {
       
-			const cipherText = CryptoJS.AES.encrypt(email, secretKey).toString();
-			const user = await User.findOne({ where: { email: cipherText } });
-			if (user) {
-				user.email = CryptoJS.AES.decrypt(user.email, secretKey).toString(
-					CryptoJS.enc.Utf8
-				);
-			}
+      const user = await User.findOne({
+        where: sequelize.literal(
+          `AES_DECRYPT(UNHEX(email), '${process.env.ENCRYPTION_SECRET}') = '${email}'`
+        ),
+        attributes: [
+          'firstName',
+          'lastName',
+          [sequelize.fn('AES_DECRYPT', sequelize.fn('UNHEX', sequelize.col('email')), process.env.ENCRYPTION_SECRET), 'email'],
+          `password`,
+          `createdAt`,
+          `updatedAt`,
+        ],
+      });
 			return user;
 		};
 	}

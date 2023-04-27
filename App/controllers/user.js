@@ -23,19 +23,7 @@ exports.login = async (req, res) => {
 
 	try {
 		// Find user in database using decrypted email
-		const user = await User.findOne({
-			where: sequelize.literal(
-				`AES_DECRYPT(UNHEX(email), '${process.env.ENCRYPTION_SECRET}') = '${email}'`
-			),
-			attributes: [
-				'firstName',
-				'lastName',
-				[sequelize.fn('AES_DECRYPT', sequelize.fn('UNHEX', sequelize.col('email')), process.env.ENCRYPTION_SECRET), 'email'],
-				`password`,
-				`createdAt`,
-				`updatedAt`,
-			],
-		});
+		const user = await User.findOneByEmail(email);
 
 		if (!user) {
 			return res.status(401).json({ error: 'User Not found' });
