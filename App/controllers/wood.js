@@ -2,7 +2,7 @@ const { Wood, Hardness, WoodType } = require('../models');
 const fs = require('fs');
 const path = require('path');
 
-exports.createWoods = (req, res, next) => {
+exports.createWoods = async (req, res, next) => {
 	//path = si null alors on met null sinon on met le chemin de l'image
 	const wood = new Wood({
 		...req.body,
@@ -10,6 +10,18 @@ exports.createWoods = (req, res, next) => {
 			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
 			: null,
 	});
+	console.log(req.body);
+			// Check if the typeId and hardnessId exist in the database before saving
+			const [hardness, type] = await Promise.all([
+				Hardness.findByPk(wood.hardnessId),
+				WoodType.findByPk(wood.typeId),
+			]);
+			if (!hardness) {
+				return res.status(404).json({ error: 'Hardness not found' });
+			}
+			if (!type) {
+				return res.status(404).json({ error: 'Wood type not found' });
+			}
 
 	// On enregistre l'objet Wood dans la base de données
 	wood
@@ -36,7 +48,9 @@ exports.getOneWoods = async (req, res, next) => {
 };
 exports.getAllWoods = async (req, res) => {
 	try {
-		const woods = await Wood.findAll();
+		const woods = await Wood.findAll({
+			include: [{ model: Hardness }, { model: WoodType }]
+		  });
 		res.json(woods);
 	} catch (error) {
 		console.error(error);
@@ -87,7 +101,7 @@ exports.updateWoods = async (req, res, next) => {
 
 		wood.image = req.file
 			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-			: null;
+			: wood.image;
 
 		await wood.save();
 

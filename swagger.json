@@ -141,7 +141,7 @@
                     },
                     {
                         "in": "formData",
-                        "name": "woodTypeId",
+                        "name": "typeId",
                         "type": "integer",
                         "required": true
                     },
@@ -198,6 +198,7 @@
                     "200": {
                         "description": "Woods returned",
                         "schema": {
+                            "type": "array",
                             "$ref": "#/definitions/Wood"
                         }
                     },
@@ -284,7 +285,7 @@
                         "format": "int64"
                     },
                     {
-                        "name": "woodTypeId",
+                        "name": "typeId",
                         "in": "formData",
                         "description": "Updated wood type ID of wood",
                         "required": true,
