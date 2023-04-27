@@ -33,7 +33,7 @@
                         "description": "The user object to create",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/User"
+                            "$ref": "#/definitions/UserCreate"
                         }
                     }
                 ],
@@ -357,7 +357,24 @@
                 "id": {
                     "type": "integer"
                 },
-                "username": {
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserCreate": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
                     "type": "string"
                 },
                 "email": {
@@ -415,10 +432,12 @@
                     "$ref": "#/definitions/WoodType"
                 },
                 "createdAt": {
-                    "type": "datetime"
+                    "type": "string",
+                    "format": "date-time"
                 },
                 "updatedAt": {
-                    "type": "datetime"
+                    "type": "string",
+                    "format": "date-time"
                 }
             }
         },

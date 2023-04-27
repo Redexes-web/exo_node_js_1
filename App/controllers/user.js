@@ -11,7 +11,7 @@ exports.signup = async (req, res) => {
 			),
 			password: await bcrypt.hash(req.body.password, 10),
 		});
-		res.status(201).json(user);
+		res.status(201).json({ ...user.dataValues, email: req.body.email, password: undefined,createdAt: undefined, updatedAt: undefined });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send('Error create user');
@@ -39,7 +39,8 @@ exports.login = async (req, res) => {
 		// Generate JWT token
 		const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECRET, {
 			expiresIn: '24h',
-		})
+		});
+        console.log(user.id)
 		res.json({
 			user: {
 				id: user.id,

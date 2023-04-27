@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
           `AES_DECRYPT(UNHEX(email), '${process.env.ENCRYPTION_SECRET}') = '${email}'`
         ),
         attributes: [
+          'id',
           'firstName',
           'lastName',
           [sequelize.fn('AES_DECRYPT', sequelize.fn('UNHEX', sequelize.col('email')), process.env.ENCRYPTION_SECRET), 'email'],
