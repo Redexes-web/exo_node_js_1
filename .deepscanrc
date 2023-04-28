@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "style": {
+      "max-depth": ["error", 4],
+      "max-nested-callbacks": ["error", 4],
+      "no-restricted-modules": ["error", "fs", "path"],
+      "no-underscore-dangle": ["error", { "allowAfterThis": true }]
+    },
+    "security": {
+      "detect-buffer-noassert": "error",
+      "detect-child-process": "error",
+      "detect-eval-with-expression": "error"
+    }
+  }
+}
