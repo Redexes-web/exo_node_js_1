@@ -1,8 +1,7 @@
 const { Wood, Hardness, WoodType } = require('../models');
 const fs = require('fs');
-const {
-	setWoodLinks
-} = require('../utils/linkSetter');
+const { setWoodLinks } = require('../utils/linkSetter');
+const path = require('path');
 
 // Create a wood
 exports.createWoods = async (req, res, next) => {
@@ -57,40 +56,6 @@ exports.getAllWoods = async (req, res, next) => {
 	}
 };
 
-// Update a wood by id
-exports.updateWoods = async (req, res, next) => {
-	try {
-		const wood = await Wood.findByPk(parseInt(req.params.id), {
-			include: [{ model: Hardness }, { model: WoodType }],
-		});
-
-		if (!wood) {
-			return res.status(404).json({ error: 'Bois non trouvé !' });
-		}
-
-		const imagePath = req.file
-			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-			: wood.image;
-
-		if (req.file && wood.image) {
-			const imagePath = wood.image.split(
-				`${req.protocol}://${req.get('host')}/uploads/`
-			)[1];
-			if (fs.existsSync(`uploads/${imagePath}`)) {
-				await fs.promises.unlink(`uploads/${imagePath}`);
-			}
-		}
-
-		await wood.update({ ...req.body, image: imagePath });
-		await wood.reload({ include: [{ model: Hardness }, { model: WoodType }] });
-
-		setWoodLinks(wood);
-		res.json(wood);
-	} catch (error) {
-		next(error);
-	}
-};
-
 // Get woods by hardness
 exports.findByHardness = async (req, res, next) => {
 	try {
@@ -119,6 +84,55 @@ exports.findByHardness = async (req, res, next) => {
 		next(error);
 	}
 };
+
+// Update a wood by id
+exports.updateWoods = async (req, res, next) => {
+	try {
+		const wood = await Wood.findByPk(parseInt(req.params.id), {
+			include: [{ model: Hardness }, { model: WoodType }],
+		});
+
+		if (!wood) {
+			return res.status(404).json({ error: 'Bois non trouvé !' });
+		}
+
+		const safeProtocols = ['http', 'https'];
+		const isSafeProtocol = safeProtocols.includes(req.protocol);
+		if (!isSafeProtocol) {
+			console.error('Protocol not allowed');
+			return res.status(400).send('Protocol not allowed');
+		}
+		const safeHost = req.get('host'); // Add validation if necessary
+
+		const imagePath = req.file
+			? `${req.protocol}://${safeHost}/uploads/${req.file.filename}`
+			: wood.image;
+
+		if (req.file && wood.image && /^image/.test(req.file.mimetype)) {
+			const woodImagePath = wood.image.split(
+				`${req.protocol}://${safeHost}/uploads/`
+			)[1];
+			const woodImagePathSafe = path.normalize(`uploads/${woodImagePath}`);
+
+			if (fs.existsSync(woodImagePathSafe)) {
+				try {
+					await fs.promises.unlink(woodImagePathSafe);
+				} catch (err) {
+					console.error(err);
+					return res.status(500).send('Error deleting old wood image');
+				}
+			}
+		}
+
+		await wood.update({ ...req.body, image: imagePath });
+		await wood.reload({ include: [{ model: Hardness }, { model: WoodType }] });
+
+		setWoodLinks(wood);
+		res.json(wood);
+	} catch (error) {
+		next(error);
+	}
+};
 exports.deleteOneWoods = async (req, res) => {
 	try {
 		const wood = await Wood.findByPk(req.params.id);
@@ -128,25 +142,16 @@ exports.deleteOneWoods = async (req, res) => {
 		}
 
 		if (wood.image) {
-			// On récupère le chemin de l'image
 			const imagePath = wood.image.split(
 				`${req.protocol}://${req.get('host')}/uploads/`
 			)[1];
-			fs.access(`uploads/${imagePath}`, fs.F_OK, (err) => {
-				if (err) {
-					console.error('err' + err);
-				} else {
-					fs.unlink(`uploads/${imagePath}`, (err) => {
-						if (err) {
-							console.error(err);
-							return res
-								.status(500)
-								.send('Erreur lors de la suppression du bois');
-						}
-					});
-				}
-			});
+			const imagePathSafe = path.normalize(`uploads/${imagePath}`);
+
+			if (fs.existsSync(imagePathSafe)) {
+				await fs.promises.unlink(imagePathSafe);
+			}
 		}
+
 		await wood.destroy();
 		res.status(204).json(wood);
 	} catch (error) {
