@@ -63,7 +63,7 @@
                 "parameters": [
                     {
                         "name": "Credentials",
-                        "in": "body",
+                        "in": "request",
                         "description": "The user's email and password",
                         "required": true,
                         "schema": {
@@ -334,7 +334,7 @@
                         "JWT": []
                     }
                 ],
-                "parameters": [
+                "body": [
                     {
                         "in": "path",
                         "name": "id",
@@ -392,7 +392,21 @@
                 },
                 "password": {
                     "type": "string"
-                }
+                },
+                "links": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string"
+                        },
+                        "href": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
             }
         },
         "WoodType": {
@@ -448,7 +462,21 @@
                 "updatedAt": {
                     "type": "string",
                     "format": "date-time"
-                }
+                },
+                "links": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string"
+                        },
+                        "href": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
             }
         },
         "Credentials": {

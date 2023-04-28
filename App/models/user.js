@@ -11,11 +11,13 @@ module.exports = (sequelize, DataTypes) => {
 		}
 		static findOneByEmail = async (email) => {
       
-      //findall puis boucle sur le tableau pour trouver l'email correspondant
+      const encryptedEmail = encryptEmail(email);
+      console.log(encryptedEmail);
       
       const users = await User.findAll();
       const user = users.find((user) => {
         const decryptedEmail = decryptEmail(user.email);
+        console.error(encryptedEmail== user.email ? "true" : "false");
         console.log(decryptedEmail, email);
         return decryptedEmail === email;
       });

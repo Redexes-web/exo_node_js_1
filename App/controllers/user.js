@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
 const { encryptEmail, decryptEmail } = require('../utils/crypto');
+const { setUserLinks } = require('../utils/linkSetter');
 
 exports.signup = async (req, res) => {
 	try {
@@ -10,9 +11,10 @@ exports.signup = async (req, res) => {
 			email: encryptEmail(req.body.email),
 			password: await bcrypt.hash(req.body.password, 10),
 		});
+        setUserLinks(user);
 		res.status(201).json({
 			...user.dataValues,
-			email: req.body.email,
+			email: decryptEmail(user.email),
 			password: undefined,
 			createdAt: undefined,
 			updatedAt: undefined,
@@ -45,13 +47,14 @@ exports.login = async (req, res) => {
 		const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECRET, {
 			expiresIn: '24h',
 		});
-
+        setUserLinks(user);
 		res.json({
 			user: {
-				id: user.id,
-				firstName: user.firstName,
-				lastName: user.lastName,
+				...user.dataValues,
 				email: decryptEmail(user.email),
+                password: undefined,
+                createdAt: undefined,
+                updatedAt: undefined,
 			},
 			token,
 		});
