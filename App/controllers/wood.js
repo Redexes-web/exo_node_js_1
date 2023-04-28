@@ -1,7 +1,11 @@
 const { Wood, Hardness, WoodType } = require('../models');
 const fs = require('fs');
 const path = require('path');
-const { setWoodLinks, setHardnessLinks, setWoodTypeLinks } = require('../utils/linkSetter');
+const {
+	setWoodLinks,
+	setHardnessLinks,
+	setWoodTypeLinks,
+} = require('../utils/linkSetter');
 
 // Create a wood
 exports.createWoods = async (req, res, next) => {
@@ -10,11 +14,14 @@ exports.createWoods = async (req, res, next) => {
 			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
 			: null;
 
-		const wood = await Wood.create({
+		const wood = await Wood.build({
 			...req.body,
 			image: imagePath,
 		});
+		await wood.save();
+		await wood.reload({ include: [{ model: Hardness }, { model: WoodType }] });
 		setWoodLinks(wood);
+
 		res.status(201).json(wood);
 	} catch (error) {
 		next(error);
@@ -56,7 +63,9 @@ exports.getAllWoods = async (req, res, next) => {
 // Update a wood by id
 exports.updateWoods = async (req, res, next) => {
 	try {
-		const wood = await Wood.findByPk(parseInt(req.params.id));
+		const wood = await Wood.findByPk(parseInt(req.params.id), {
+			include: [{ model: Hardness }, { model: WoodType }],
+		});
 
 		if (!wood) {
 			return res.status(404).json({ error: 'Bois non trouvé !' });
@@ -64,7 +73,7 @@ exports.updateWoods = async (req, res, next) => {
 
 		const imagePath = req.file
 			? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-			: null;
+			: wood.image;
 
 		if (req.file && wood.image) {
 			const imagePath = wood.image.split(
@@ -76,8 +85,10 @@ exports.updateWoods = async (req, res, next) => {
 		}
 
 		await wood.update({ ...req.body, image: imagePath });
+		await wood.reload({ include: [{ model: Hardness }, { model: WoodType }] });
+
 		setWoodLinks(wood);
-		res.json({ wood });
+		res.json(wood);
 	} catch (error) {
 		next(error);
 	}
