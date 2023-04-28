@@ -6,6 +6,7 @@ const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const morgan = require('morgan');
 const fs = require('fs');
+const helmet = require('helmet');
 db.sequelize
 	.authenticate()
 	.then(() => console.log('Database connected ...'))
@@ -16,6 +17,7 @@ const logFilePath = './logs.log';
 
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
+app.use(helmet());
 app.use(morgan('combined', { stream: logStream }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());
