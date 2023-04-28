@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-	up: async (queryInterface, Sequelize) => {
+	up: async (queryInterface) => {
 		return queryInterface.bulkInsert('WoodTypes', [
 			{
 				name: 'softwood',
@@ -16,7 +16,7 @@ module.exports = {
 		]);
 	},
 
-	down: async (queryInterface, Sequelize) => {
+	down: async (queryInterface) => {
 		return queryInterface.bulkDelete('WoodTypes', null, {});
 	},
 };

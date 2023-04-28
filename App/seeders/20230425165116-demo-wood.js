@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-	async up(queryInterface, Sequelize) {
+	async up(queryInterface) {
 		// Get hardness and wood types data
 		const [hardnessData, woodTypesData] = await Promise.all([
 			queryInterface.sequelize.query('SELECT id, name FROM Hardness'),
@@ -63,7 +63,7 @@ module.exports = {
 		]);
 	},
 
-	async down(queryInterface, Sequelize) {
+	async down(queryInterface) {
 		await queryInterface.bulkDelete('Woods', null, {});
 	},
 };

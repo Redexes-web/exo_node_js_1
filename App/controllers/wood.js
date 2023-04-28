@@ -1,10 +1,7 @@
 const { Wood, Hardness, WoodType } = require('../models');
 const fs = require('fs');
-const path = require('path');
 const {
-	setWoodLinks,
-	setHardnessLinks,
-	setWoodTypeLinks,
+	setWoodLinks
 } = require('../utils/linkSetter');
 
 // Create a wood
@@ -114,7 +111,7 @@ exports.findByHardness = async (req, res, next) => {
 
 		//add links to each wood
 		woods.forEach((wood) => {
-			wood = setWoodLinks(wood);
+			setWoodLinks(wood);
 		});
 
 		res.json({ woods: woods });
@@ -122,7 +119,7 @@ exports.findByHardness = async (req, res, next) => {
 		next(error);
 	}
 };
-exports.deleteOneWoods = async (req, res, next) => {
+exports.deleteOneWoods = async (req, res) => {
 	try {
 		const wood = await Wood.findByPk(req.params.id);
 

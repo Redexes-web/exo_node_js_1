@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { User } = require('../models');
 const { encryptEmail, decryptEmail } = require('../utils/crypto');
 const { setUserLinks } = require('../utils/linkSetter');
+const process = require('process');
 
 exports.signup = async (req, res) => {
 	try {

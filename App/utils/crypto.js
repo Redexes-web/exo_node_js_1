@@ -1,5 +1,5 @@
 const CryptoJS = require('crypto-js');
-
+const process = require('process');
 // Clé de chiffrement fixe
 const ENCRYPTION_SECRET = process.env.ENCRYPTION_SECRET;
 const IV = CryptoJS.enc.Hex.parse(process.env.ENCRYPTION_IV);

@@ -1,7 +1,5 @@
 'use strict';
 const { Model } = require('sequelize');
-const { isEmail } = require('validator');
-const CryptoJS = require('crypto-js');
 const { encryptEmail, decryptEmail } = require('../utils/crypto.js');
 
 module.exports = (sequelize, DataTypes) => {
@@ -10,17 +8,16 @@ module.exports = (sequelize, DataTypes) => {
 			// define association here
 		}
 		static findOneByEmail = async (email) => {
-      
-      const encryptedEmail = encryptEmail(email);
-      console.log(encryptedEmail);
-      
-      const users = await User.findAll();
-      const user = users.find((user) => {
-        const decryptedEmail = decryptEmail(user.email);
-        console.error(encryptedEmail== user.email ? "true" : "false");
-        console.log(decryptedEmail, email);
-        return decryptedEmail === email;
-      });
+			const encryptedEmail = encryptEmail(email);
+			console.log(encryptedEmail);
+
+			const users = await User.findAll();
+			const user = users.find((user) => {
+				const decryptedEmail = decryptEmail(user.email);
+				console.error(encryptedEmail == user.email ? 'true' : 'false');
+				console.log(decryptedEmail, email);
+				return decryptedEmail === email;
+			});
 			return user;
 		};
 	}

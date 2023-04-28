@@ -33,7 +33,7 @@ function setWoodTypeLinks(wood) {
 
 function setUserLinks(user) {
     user.dataValues.links = [
-        { rel: 'self', href: '/users/' + user.id },
+        { rel: 'self', href: USER_PATH + '/' + user.id },
     ];
 }
 

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const process = require('process');
 
 module.exports = (req, res, next) => {
 	try {

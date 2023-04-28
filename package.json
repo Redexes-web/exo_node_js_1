@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server",
-    "migrate": "dotenv -e .env sequelize db:migrate"
+    "migrate": "dotenv -e .env sequelize db:migrate",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +28,8 @@
     "swagger-ui-express": "^4.6.2"
   },
   "devDependencies": {
+    "eslint": "^8.39.0",
+    "eslint-plugin-sequelize": "^1.0.4",
     "sequelize-cli": "^6.6.0"
   }
 }
