@@ -1,2 +1,2 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/redexes-web/node-exo-1/badge.svg)](https://snyk.io/test/github/redexes-web/node-exo-1)
-[![DeepScan Grade](https://deepscan.io/api/projects/24489/branches/main/badges/grade.svg)](https://deepscan.io/dashboard#view=project&tid=21085&pid=24489&bid=756182)
+[![DeepScan grade](https://deepscan.io/api/teams/21085/projects/24489/branches/756182/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=21085&pid=24489&bid=756182)

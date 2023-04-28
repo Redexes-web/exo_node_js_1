@@ -13,8 +13,7 @@ if (!IV) {
 function encryptEmail(email) {
     console.log(email)
 	const encrypted = CryptoJS.AES.encrypt(email, ENCRYPTION_SECRET, {
-        iv: IV,
-		mode: CryptoJS.mode.CTR,
+		mode: CryptoJS.mode.ECB,
         padding: CryptoJS.pad.Pkcs7,
 	});
 	return encrypted.toString();
@@ -22,8 +21,7 @@ function encryptEmail(email) {
 
 function decryptEmail(email) {
     const decrypted = CryptoJS.AES.decrypt(email, ENCRYPTION_SECRET, {
-        iv: IV,
-		mode: CryptoJS.mode.CTR,
+		mode: CryptoJS.mode.ECB,
         padding: CryptoJS.pad.Pkcs7,
 	});
 	return decrypted.toString(CryptoJS.enc.Utf8);
